@@ -1,5 +1,6 @@
 /**
- * OxyTalk Backend (Beginner-Friendly) — FINAL WORKING VERSION ✅
+ * OxyTalk Backend — FINAL STABLE & SAFE VERSION ✅
+ * (No features removed, only critical fixes)
  */
 
 const express = require("express");
@@ -15,21 +16,22 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+/* ================= MIDDLEWARE ================= */
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // ✅ FIX
 app.use(cookieParser());
 
-// ✅ STATIC FILES
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-// ✅ ROOT ROUTE (IMPORTANT)
+/* ================= ROOT ================= */
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "login.html"));
 });
 
+/* ================= DATABASE ================= */
 const DB_PATH = path.join(__dirname, "database.json");
 
-// -------------------- DB HELPERS --------------------
 function readDB() {
   if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(
@@ -44,7 +46,7 @@ function writeDB(db) {
   fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
 }
 
-// -------------------- HELPERS --------------------
+/* ================= HELPERS ================= */
 function uid() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
@@ -65,7 +67,7 @@ function areContacts(db, a, b) {
   );
 }
 
-// -------------------- AUTH --------------------
+/* ================= AUTH ================= */
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return res.status(401).json({ error: "No token" });
@@ -78,7 +80,7 @@ function authMiddleware(req, res, next) {
   next();
 }
 
-// -------------------- MULTER --------------------
+/* ================= MULTER ================= */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, "public/uploads");
@@ -91,7 +93,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// -------------------- ROUTES --------------------
+/* ================= ROUTES ================= */
 
 // REGISTER
 app.post("/api/register", upload.single("avatar"), (req, res) => {
@@ -100,8 +102,10 @@ app.post("/api/register", upload.single("avatar"), (req, res) => {
     return res.status(400).json({ error: "All fields required" });
 
   const db = readDB();
+
   if (db.users.some(u => u.email === email))
     return res.status(409).json({ error: "Email already used" });
+
   if (db.users.some(u => u.username === username))
     return res.status(409).json({ error: "Username taken" });
 
@@ -128,6 +132,7 @@ app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
   const db = readDB();
   const user = db.users.find(u => u.email === email);
+
   if (!user || !bcrypt.compareSync(password, user.passwordHash))
     return res.status(401).json({ error: "Invalid login" });
 
@@ -144,9 +149,11 @@ app.post("/api/login", (req, res) => {
 app.get("/api/search", authMiddleware, (req, res) => {
   const q = (req.query.username || "").toLowerCase();
   const db = readDB();
+
   const results = db.users
     .filter(u => u.username.toLowerCase().includes(q) && u.id !== req.user.id)
     .map(u => ({ id: u.id, username: u.username, avatarUrl: u.avatarUrl }));
+
   res.json({ results });
 });
 
@@ -154,19 +161,37 @@ app.get("/api/search", authMiddleware, (req, res) => {
 app.get("/api/contact/check/:id", authMiddleware, (req, res) => {
   const db = readDB();
   const ok = areContacts(db, req.user.id, req.params.id);
-  res.json(ok ? { isContact: true, chatId: chatIdFor(req.user.id, req.params.id) } : { isContact: false });
+
+  res.json(
+    ok
+      ? { isContact: true, chatId: chatIdFor(req.user.id, req.params.id) }
+      : { isContact: false }
+  );
 });
 
-// INVITES
+// SEND INVITE (duplicate safe)
 app.post("/api/invite/send", authMiddleware, (req, res) => {
+  const { toUserId } = req.body;
   const db = readDB();
-  if (areContacts(db, req.user.id, req.body.toUserId))
+
+  if (areContacts(db, req.user.id, toUserId))
     return res.status(409).json({ error: "Already contacts" });
+
+  if (
+    db.invites.some(
+      i =>
+        i.status === "pending" &&
+        ((i.fromUserId === req.user.id && i.toUserId === toUserId) ||
+          (i.fromUserId === toUserId && i.toUserId === req.user.id))
+    )
+  ) {
+    return res.status(409).json({ error: "Invite already pending" });
+  }
 
   db.invites.push({
     id: uid(),
     fromUserId: req.user.id,
-    toUserId: req.body.toUserId,
+    toUserId,
     status: "pending"
   });
 
@@ -178,10 +203,14 @@ app.post("/api/invite/send", authMiddleware, (req, res) => {
 app.post("/api/invite/respond", authMiddleware, (req, res) => {
   const db = readDB();
   const inv = db.invites.find(i => i.id === req.body.inviteId);
+
   if (!inv) return res.status(404).json({ error: "Invite not found" });
 
   inv.status = "accepted";
-  db.contacts.push({ userA: inv.fromUserId, userB: inv.toUserId });
+
+  if (!areContacts(db, inv.fromUserId, inv.toUserId)) {
+    db.contacts.push({ userA: inv.fromUserId, userB: inv.toUserId });
+  }
 
   const chatId = chatIdFor(inv.fromUserId, inv.toUserId);
   if (!db.chats[chatId]) db.chats[chatId] = { messages: [] };
@@ -190,27 +219,36 @@ app.post("/api/invite/respond", authMiddleware, (req, res) => {
   res.json({ chatId, otherUserId: inv.fromUserId });
 });
 
-// CHAT HISTORY
+// CHAT HISTORY (SAFE)
 app.get("/api/chat/:id", authMiddleware, (req, res) => {
   const db = readDB();
-  res.json({ messages: db.chats[req.params.id]?.messages || [] });
+  if (!db.chats[req.params.id]) db.chats[req.params.id] = { messages: [] };
+  res.json({ messages: db.chats[req.params.id].messages });
 });
 
-// -------------------- SOCKET --------------------
+/* ================= SOCKET ================= */
 io.on("connection", socket => {
   socket.on("auth", ({ token }) => {
     const db = readDB();
     const user = db.users.find(u => u.token === token);
-    if (!user) return socket.disconnect();
+    if (!user) return socket.disconnect(true);
 
     socket.userId = user.id;
     socket.username = user.username;
+
     io.emit("presence", { userId: user.id, online: true });
   });
 
-  socket.on("join_chat", ({ chatId }) => socket.join(chatId));
+  socket.on("join_chat", ({ chatId }) => {
+    socket.join(chatId);
+  });
 
   socket.on("send_message", ({ chatId, text, ephemeral }) => {
+    if (!socket.userId) return;
+
+    const db = readDB();
+    if (!db.chats[chatId]) db.chats[chatId] = { messages: [] };
+
     const msg = {
       id: uid(),
       chatId,
@@ -219,16 +257,24 @@ io.on("connection", socket => {
       text,
       time: new Date().toLocaleTimeString().slice(0, 5)
     };
+
     io.to(chatId).emit("new_message", msg);
 
     if (!ephemeral) {
-      const db = readDB();
       db.chats[chatId].messages.push(msg);
       writeDB(db);
     }
   });
+
+  socket.on("disconnect", () => {
+    if (socket.userId) {
+      io.emit("presence", { userId: socket.userId, online: false });
+    }
+  });
 });
 
-// -------------------- START --------------------
+/* ================= START ================= */
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log("OxyTalk running on", PORT));
+server.listen(PORT, () => {
+  console.log("OxyTalk running on", PORT);
+});
