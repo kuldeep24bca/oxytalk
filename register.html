@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OxyTalk - Register</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="center">
+  <div class="card">
+    <h1>OxyTalk</h1>
+    <p class="tagline">Talk with your oxygen</p>
+
+    <h2>Create account</h2>
+
+    <form id="registerForm">
+      <label>Username</label>
+      <input name="username" placeholder="e.g. dolly_queen" required />
+
+      <label>Email</label>
+      <input name="email" type="email" placeholder="you@email.com" required />
+
+      <label>Password</label>
+      <input name="password" type="password" placeholder="min 6 chars" required />
+
+      <label>Profile photo (optional)</label>
+      <input name="avatar" type="file" accept="image/*" />
+
+      <button type="submit">Register</button>
+    </form>
+
+    <p class="muted">
+      Already have account? <a href="login.html">Login</a>
+    </p>
+
+    <p id="msg" class="error"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+{
+  "users": [
+    {
+      "id": "e8vfqcxcm7amjojypx9",
+      "email": "thekuldeepgehlot@gmail.com",
+      "username": "kuldeep10x",
+      "passwordHash": "$2a$10$ClLI/cNLkwncH7Oy.xINBuHdndxLkavIuU5WG.7VmNzJ3K8JZ9GOW",
+      "avatarUrl": "",
+      "token": "qnapbzcppuimjokh1tm",
+      "createdAt": 1766855195325
+    },
+    {
+      "id": "2heaujraxlkmjojz7ty",
+      "email": "dolly.soni2005@gmail.com",
+      "username": "dolly10x",
+      "passwordHash": "$2a$10$YhsS.YoqY1rdbr3muTU5J.lZXd4OhNBXZAyMetZtjNxkckt6eO5J.",
+      "avatarUrl": "",
+      "token": "1l1n7f21t7gmjok1zud",
+      "createdAt": 1766855218534
+    }
+  ],
+  "invites": [
+    {
+      "id": "wf7j0jynulamjojzehq",
+      "fromUserId": "2heaujraxlkmjojz7ty",
+      "toUserId": "e8vfqcxcm7amjojypx9",
+      "status": "accepted",
+      "createdAt": 1766855227167
+    }
+  ],
+  "contacts": [
+    {
+      "userA": "2heaujraxlkmjojz7ty",
+      "userB": "e8vfqcxcm7amjojypx9"
+    }
+  ],
+  "chats": {
+    "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9": {
+      "messages": [
+        {
+          "id": "52yb6xki1ojmjojzmgk",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "e8vfqcxcm7amjojypx9",
+          "fromUsername": "kuldeep10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "22:37",
+          "createdAt": 1766855237492
+        },
+        {
+          "id": "626mrnn3potmjok19ec",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "e8vfqcxcm7amjojypx9",
+          "fromUsername": "kuldeep10x",
+          "fromAvatarUrl": "",
+          "text": "hlo",
+          "time": "22:38",
+          "createdAt": 1766855313876
+        },
+        {
+          "id": "yf0ts6sfweamjokabuf",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "e8vfqcxcm7amjojypx9",
+          "fromUsername": "kuldeep10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "22:45",
+          "createdAt": 1766855736951
+        },
+        {
+          "id": "n5oke5jj0zhmjokamt9",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "2heaujraxlkmjojz7ty",
+          "fromUsername": "dolly10x",
+          "fromAvatarUrl": "",
+          "text": "hlo",
+          "time": "22:45",
+          "createdAt": 1766855751165
+        },
+        {
+          "id": "gi49gvoe6d9mjokaonq",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "2heaujraxlkmjojz7ty",
+          "fromUsername": "dolly10x",
+          "fromAvatarUrl": "",
+          "text": "my hukum",
+          "time": "22:45",
+          "createdAt": 1766855753558
+        },
+        {
+          "id": "n2cz2126r6mjokhipj",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "2heaujraxlkmjojz7ty",
+          "fromUsername": "dolly10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "22:51",
+          "createdAt": 1766856072439
+        },
+        {
+          "id": "sx2qzghgrwmjokiq8m",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "2heaujraxlkmjojz7ty",
+          "fromUsername": "dolly10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "22:52",
+          "createdAt": 1766856128854
+        },
+        {
+          "id": "8697lgnwlvsmjokm6gs",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "e8vfqcxcm7amjojypx9",
+          "fromUsername": "kuldeep10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "22:54",
+          "createdAt": 1766856289852
+        },
+        {
+          "id": "v8f1qauljcmjokmhml",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "2heaujraxlkmjojz7ty",
+          "fromUsername": "dolly10x",
+          "fromAvatarUrl": "",
+          "text": "baby are you fine ??",
+          "time": "22:55",
+          "createdAt": 1766856304317
+        },
+        {
+          "id": "g6q0astvt37mjokn4fy",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "2heaujraxlkmjojz7ty",
+          "fromUsername": "dolly10x",
+          "fromAvatarUrl": "",
+          "text": "are you fine bachaa",
+          "time": "22:55",
+          "createdAt": 1766856333886
+        },
+        {
+          "id": "7bmz9yqdhd6mjole746",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "e8vfqcxcm7amjojypx9",
+          "fromUsername": "kuldeep10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "23:16",
+          "createdAt": 1766857597062
+        },
+        {
+          "id": "9ru8inp0vr8mjoleuwl",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "2heaujraxlkmjojz7ty",
+          "fromUsername": "dolly10x",
+          "fromAvatarUrl": "",
+          "text": "hlo",
+          "time": "23:17",
+          "createdAt": 1766857627893
+        },
+        {
+          "id": "my8p44zb0ikmjonsea4",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "e8vfqcxcm7amjojypx9",
+          "fromUsername": "kuldeep10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "00:23",
+          "createdAt": 1766861618764
+        },
+        {
+          "id": "vi17umd829mjooroge",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "e8vfqcxcm7amjojypx9",
+          "fromUsername": "kuldeep10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "00:51",
+          "createdAt": 1766863264910
+        },
+        {
+          "id": "yjyrhdcvnwmjoos6at",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "2heaujraxlkmjojz7ty",
+          "fromUsername": "dolly10x",
+          "fromAvatarUrl": "",
+          "text": "hlo",
+          "time": "00:51",
+          "createdAt": 1766863288037
+        },
+        {
+          "id": "qris1637gimjoou5sw",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "2heaujraxlkmjojz7ty",
+          "fromUsername": "dolly10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "00:53",
+          "createdAt": 1766863380704
+        },
+        {
+          "id": "s6wn4f0qjgsmjooud0b",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "e8vfqcxcm7amjojypx9",
+          "fromUsername": "kuldeep10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "00:53",
+          "createdAt": 1766863390043
+        },
+        {
+          "id": "jfalkpr4fzjmjoouidj",
+          "chatId": "2heaujraxlkmjojz7ty__e8vfqcxcm7amjojypx9",
+          "fromUserId": "e8vfqcxcm7amjojypx9",
+          "fromUsername": "kuldeep10x",
+          "fromAvatarUrl": "",
+          "text": "hi",
+          "time": "00:53",
+          "createdAt": 1766863396999
+        }
+      ]
+    }
+  }
+}

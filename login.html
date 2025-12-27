@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OxyTalk - Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="center">
+  <div class="card">
+    <h1>OxyTalk</h1>
+    <p class="tagline">The secret place to talk with the one you can’t live without.</p>
+
+    <h2>Login</h2>
+
+    <form id="loginForm">
+      <label>Email</label>
+      <input name="email" type="email" placeholder="you@email.com" required />
+
+      <label>Password</label>
+      <input name="password" type="password" placeholder="******" required />
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p class="muted">
+      New here? <a href="register.html">Create account</a>
+    </p>
+
+    <p id="msg" class="error"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
