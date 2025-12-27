@@ -1,51 +1,65 @@
 /**
- * OxyTalk Frontend – FINAL STABLE VERSION
- * ✔ Persistent Chats (below Invitations)
- * ✔ Works after refresh / logout
- * ✔ Search / Invite / Open Chat untouched
+ * OxyTalk Frontend – FINAL STABLE VERSION ✅
+ * ✔ DOM-safe (DOMContentLoaded)
+ * ✔ Persistent Contacts
+ * ✔ Search / Invite / Chat works
+ * ✔ Render / Hostinger compatible
  */
 
-const API = {
-  async post(url, body, isForm = false) {
-    const token = localStorage.getItem("token") || "";
-    const res = await fetch(url, {
-      method: "POST",
-      headers: isForm
-        ? { Authorization: `Bearer ${token}` }
-        : {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-      body: isForm ? body : JSON.stringify(body)
-    });
-    return { ok: res.ok, data: await res.json().catch(() => ({})) };
-  },
+window.addEventListener("DOMContentLoaded", () => {
 
-  async get(url) {
-    const token = localStorage.getItem("token") || "";
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return { ok: res.ok, data: await res.json().catch(() => ({})) };
-  },
+  /* ================= API HELPER ================= */
+  const API = {
+    async post(url, body, isForm = false) {
+      const token = localStorage.getItem("token") || "";
+      const res = await fetch(url, {
+        method: "POST",
+        headers: isForm
+          ? { Authorization: `Bearer ${token}` }
+          : {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+        body: isForm ? body : JSON.stringify(body)
+      });
 
-  async del(url) {
-    const token = localStorage.getItem("token") || "";
-    const res = await fetch(url, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return { ok: res.ok, data: await res.json().catch(() => ({})) };
-  }
-};
+      return { ok: res.ok, data: await res.json().catch(() => ({})) };
+    },
 
-/* ================= CHAT PAGE ================= */
-const messagesEl = document.getElementById("messages");
-if (messagesEl) {
+    async get(url) {
+      const token = localStorage.getItem("token") || "";
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      return { ok: res.ok, data: await res.json().catch(() => ({})) };
+    },
+
+    async del(url) {
+      const token = localStorage.getItem("token") || "";
+      const res = await fetch(url, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      return { ok: res.ok, data: await res.json().catch(() => ({})) };
+    }
+  };
+
+  /* ================= CHAT PAGE CHECK ================= */
+  const messagesEl = document.getElementById("messages");
+  if (!messagesEl) return; // ❌ Not chat page
+
+  /* ================= USER ================= */
   const me = JSON.parse(localStorage.getItem("user") || "{}");
   const token = localStorage.getItem("token") || "";
 
-  /* ---- UI refs ---- */
+  if (!token || !me.id) {
+    location.href = "login.html";
+    return;
+  }
+
+  /* ================= UI REFS ================= */
   const meAvatar = document.getElementById("meAvatar");
   const meName = document.getElementById("meName");
   const searchInput = document.getElementById("searchInput");
@@ -73,12 +87,13 @@ if (messagesEl) {
     location.href = "login.html";
   };
 
+  /* ================= STATE ================= */
   let currentChatId = "";
   let currentOtherUserId = "";
   let onlineMap = {};
   let typingTimer = null;
 
-  /* ================= PERSISTENT CONTACTS ================= */
+  /* ================= CONTACTS ================= */
   async function loadContacts() {
     if (!chatListEl) return;
 
@@ -91,7 +106,7 @@ if (messagesEl) {
       div.className = "chat-item";
 
       div.innerHTML = `
-        <img class="avatar" src="${c.avatarUrl || meAvatar.src}">
+        <img class="avatar" src="${c.avatarUrl || me.avatarUrl}">
         <div class="meta">
           <div class="title">${c.username}</div>
           <div class="sub">${onlineMap[c.userId] ? "🟢 Online" : "🔴 Offline"}</div>
@@ -101,7 +116,7 @@ if (messagesEl) {
       div.onclick = async () => {
         const check = await API.get(`/api/contact/check/${c.userId}`);
         if (check.ok && check.data.isContact) {
-          startChat(check.data.chatId, c.userId);
+          startChat(check.data.chatId, c.userId, c.username, c.avatarUrl);
         }
       };
 
@@ -123,19 +138,17 @@ if (messagesEl) {
       const div = document.createElement("div");
       div.className = "item";
 
-      const buttonText = check.data.isContact ? "Open Chat" : "Send Invite";
-
       div.innerHTML = `
         <div class="meta">
           <div class="title">${u.username}</div>
           <div class="sub">${onlineMap[u.id] ? "🟢 Online" : "🔴 Offline"}</div>
         </div>
-        <button>${buttonText}</button>
+        <button>${check.data.isContact ? "Open Chat" : "Send Invite"}</button>
       `;
 
       div.querySelector("button").onclick = async () => {
         if (check.data.isContact) {
-          startChat(check.data.chatId, u.id);
+          startChat(check.data.chatId, u.id, u.username, u.avatarUrl);
         } else {
           await API.post("/api/invite/send", { toUserId: u.id });
           alert("Invite sent ✅");
@@ -157,6 +170,7 @@ if (messagesEl) {
     res.data.incoming.forEach(inv => {
       const div = document.createElement("div");
       div.className = "item";
+
       div.innerHTML = `
         <div class="meta">
           <div class="title">${inv.fromUsername}</div>
@@ -170,10 +184,11 @@ if (messagesEl) {
           inviteId: inv.id,
           action: "accept"
         });
+
         if (out.ok) {
           startChat(out.data.chatId, out.data.otherUserId);
           loadInvites();
-          loadContacts(); // 🔥 important
+          loadContacts();
         }
       };
 
@@ -183,14 +198,17 @@ if (messagesEl) {
 
   /* ================= SOCKET ================= */
   const socket = io();
-  socket.on("connect", () => socket.emit("auth", { token }));
+
+  socket.on("connect", () => {
+    socket.emit("auth", { token });
+  });
 
   socket.on("presence", ({ userId, online }) => {
     onlineMap[userId] = online;
     if (userId === currentOtherUserId) {
       presenceText.textContent = online ? "🟢 Online" : "🔴 Offline";
     }
-    loadContacts(); // update online dots
+    loadContacts();
   });
 
   socket.on("typing", ({ userId, isTyping }) => {
@@ -200,19 +218,19 @@ if (messagesEl) {
   });
 
   socket.on("new_message", (msg) => {
-    if (msg.chatId !== currentChatId) return;
-    addMessage(msg);
+    if (msg.chatId === currentChatId) addMessage(msg);
   });
 
   /* ================= CHAT ================= */
-  async function startChat(chatId, otherUserId) {
+  async function startChat(chatId, otherId, name = "", avatar = "") {
     currentChatId = chatId;
-    currentOtherUserId = otherUserId;
+    currentOtherUserId = otherId;
+
+    otherName.textContent = name;
+    otherAvatar.src = avatar || "";
 
     sendBtn.disabled = false;
     messageInput.disabled = false;
-    clearChatBtn.disabled = false;
-    lockBtn.disabled = false;
 
     messagesEl.innerHTML = "";
     socket.emit("join_chat", { chatId });
@@ -245,7 +263,7 @@ if (messagesEl) {
     socket.emit("send_message", {
       chatId: currentChatId,
       text,
-      ephemeral: localStorage.getItem("onceView") === "1"
+      ephemeral: onceViewToggle.checked
     });
 
     messageInput.value = "";
@@ -253,5 +271,5 @@ if (messagesEl) {
 
   /* ================= INIT ================= */
   loadInvites();
-  loadContacts(); // 🔥 persistent chats
-}
+  loadContacts();
+});
