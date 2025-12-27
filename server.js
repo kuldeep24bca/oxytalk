@@ -170,6 +170,26 @@ app.get("/api/contact/check/:id", authMiddleware, (req, res) => {
 });
 
 // SEND INVITE (duplicate safe)
+// LIST INCOMING INVITES (FIX)
+app.get("/api/invite/list", authMiddleware, (req, res) => {
+  const db = readDB();
+
+  const incoming = db.invites
+    .filter(inv => inv.toUserId === req.user.id && inv.status === "pending")
+    .map(inv => {
+      const from = db.users.find(u => u.id === inv.fromUserId);
+      return {
+        id: inv.id,
+        fromUserId: inv.fromUserId,
+        fromUsername: from?.username || "Unknown",
+        fromAvatarUrl: from?.avatarUrl || "",
+        createdAt: inv.createdAt || Date.now()
+      };
+    });
+
+  res.json({ incoming });
+});
+
 app.post("/api/invite/send", authMiddleware, (req, res) => {
   const { toUserId } = req.body;
   const db = readDB();
