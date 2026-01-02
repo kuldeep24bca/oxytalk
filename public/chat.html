@@ -1,101 +1,125 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OxyTalk - Chat</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OxyTalk – Chat</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+  <div class="app">
 
-  <!-- ================= HEADER ================= -->
-  <header class="topbar">
-    <div class="top-left">
-      <span class="back-btn">←</span>
-      <div class="brand">
-        <div class="brand-title">OxyTalk</div>
-        <div class="brand-sub">Talk with your oxygen</div>
+    <!-- ================= TOP BAR (MOBILE) ================= -->
+    <header class="top-bar">
+      <button id="menuBtn" class="icon-btn">☰</button>
+      <div class="app-title">OxyTalk</div>
+      <button id="searchToggle" class="icon-btn">🔍</button>
+    </header>
+
+    <!-- ================= MOBILE SEARCH OVERLAY ================= -->
+    <div id="topSearch" class="top-search hidden">
+      <div class="search-flex">
+        <input id="searchInput" class="input" placeholder="Search username..." />
+        <button id="searchBtn" class="btn">Search</button>
       </div>
+      <div id="topSearchResults" class="list"></div>
     </div>
 
-    <div class="top-actions">
-      <button id="lockBtn" class="icon-btn ghost" disabled title="Lock Chat">🔒</button>
-      <button id="clearChatBtn" class="icon-btn danger" disabled title="Clear Chat">🗑</button>
+    <div class="shell">
 
-      <label class="toggle desktop-only">
-        <input type="checkbox" id="onceViewToggle" />
-        <span>Once-View</span>
-      </label>
+      <!-- ================= SIDEBAR ================= -->
+      <aside id="sidebar" class="panel sidebar">
 
-      <button id="logoutBtn" class="ghost desktop-only">Logout</button>
-    </div>
-  </header>
-
-  <!-- ================= MAIN ================= -->
-  <main class="layout">
-
-    <!-- ========== SIDEBAR ========== -->
-    <aside class="sidebar">
-      <div class="me">
-        <img id="meAvatar" class="avatar" />
-        <div>
-          <div id="meName" class="me-name"></div>
-          <div class="muted small">Private 1-to-1 only</div>
-        </div>
-      </div>
-
-      <!-- 🔵 NEW: CHAT LIST (REQUIRED FOR WHATSAPP STYLE) -->
-      <h3>Chats</h3>
-      <div id="chatList" class="list"></div>
-
-      <!-- EXISTING SEARCH (UNCHANGED) -->
-      <div class="searchBox">
-        <input id="searchInput" placeholder="Search username…" />
-        <button id="searchBtn">Search</button>
-      </div>
-
-      <div id="searchResults" class="list"></div>
-
-      <h3>Invitations</h3>
-      <div id="invites" class="list"></div>
-    </aside>
-
-    <!-- ========== CHAT AREA ========== -->
-    <section class="chatbox">
-
-      <div class="chatHeader">
-        <div class="chatWith">
-          <img id="otherAvatar" class="avatar" />
-          <div>
-            <div id="otherName" class="chat-with-name">No chat selected</div>
-            <div id="presenceText" class="muted small">—</div>
-            <div id="typingText" class="typing"></div>
+        <!-- USER INFO -->
+        <div class="sidebar-top">
+          <!-- Change this line in your chat.html -->
+<img id="otherAvatar" class="avatar" />
+          <div class="me-meta">
+            <div id="meName" class="name">Me</div>
+            <div class="sub">Private 1-to-1 only</div>
           </div>
         </div>
-      </div>
 
-      <div id="messages" class="messages"></div>
-
-      <form id="sendForm" class="sendBar">
-        <input id="messageInput" placeholder="Type a message…" autocomplete="off" disabled />
-        <button id="sendBtn" disabled>Send</button>
-      </form>
-
-      <div id="lockOverlay" class="lockOverlay hidden">
-        <div class="lockCard">
-          <h3>Chat Locked 🔒</h3>
-          <p class="muted">Enter your password to unlock.</p>
-          <input id="unlockPassword" type="password" placeholder="Password" />
-          <button id="unlockBtn">Unlock</button>
-          <p id="unlockMsg" class="error"></p>
+        <!-- SEARCH (DESKTOP / SIDEBAR) -->
+        <div class="section">
+          <h3>Search Users</h3>
         </div>
-      </div>
+        <div class="searchbar">
+          <input id="searchInputDesktop" class="input" placeholder="Search username..." />
+          <button id="searchBtnDesktop" class="btn">Search</button>
+        </div>
 
-    </section>
-  </main>
+        <!-- Search Results for Desktop -->
+        <div id="searchResults" class="list"></div>
 
+        <!-- INVITES -->
+        <div class="section">
+          <h3>Invitations</h3>
+        </div>
+        <div id="invites" class="list"></div>
+
+        <!-- CHATS (CONTACTS) -->
+        <div class="section">
+          <h3>Chats</h3>
+        </div>
+        <div id="chatList" class="list"></div>
+
+      </aside>
+
+      <!-- ================= MAIN CHAT ================= -->
+      <main class="panel main">
+
+        <!-- CHAT HEADER -->
+        <div class="main-top">
+          <div class="chat-head">
+            <img id="otherAvatar" class="avatar" src="https://ui-avatars.com/api/?name=Chat&background=333&color=fff" alt="other">
+            <div class="who">
+              <div id="otherName" class="title">No chat selected</div>
+              <div class="presence">
+                <span id="presenceText" class="pill">—</span>
+                <span id="typingText"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="clearChatBtn" class="btn secondary" type="button" disabled>
+              Clear
+            </button>
+            <button id="logoutBtn" class="btn logout" type="button">
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- MESSAGES -->
+        <div id="messages" class="messages">
+          <div class="empty-state">
+            <h2>Start a private chat</h2>
+            <p>Search a username, send invite, accept, then chat here.</p>
+          </div>
+        </div>
+
+        <!-- COMPOSER -->
+        <form id="sendForm" class="composer">
+          <input
+            id="messageInput"
+            class="input"
+            placeholder="Type a message..."
+            disabled
+          />
+          <button id="sendBtn" class="btn" type="submit" disabled>
+            Send
+          </button>
+        </form>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= SCRIPTS ================= -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
