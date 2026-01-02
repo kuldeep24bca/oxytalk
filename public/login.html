@@ -1,36 +1,44 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>OxyTalk - Login</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
-<body class="center">
-  <div class="card">
-    <h1>OxyTalk</h1>
-    <p class="tagline">The secret place to talk with the one you can’t live without.</p>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand">
+        <div class="logo">O</div>
+        <div>
+          <h1>OxyTalk</h1>
+          <p>Talk with your oxygen</p>
+        </div>
+      </div>
 
-    <h2>Login</h2>
+      <div class="auth-title">Login</div>
 
-    <form id="loginForm">
-      <label>Email</label>
-      <input name="email" type="email" placeholder="you@email.com" required />
+      <form id="loginForm">
+        <div class="field">
+          <label>Email</label>
+          <input class="input" name="email" type="email" placeholder="you@email.com" required />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input class="input" name="password" type="password" placeholder="••••••••" required />
+        </div>
 
-      <label>Password</label>
-      <input name="password" type="password" placeholder="******" required />
+        <button class="btn" type="submit">Login</button>
+      </form>
 
-      <button type="submit">Login</button>
-    </form>
-
-    <p class="muted">
-      New here? <a href="register.html">Create account</a>
-    </p>
-
-    <p id="msg" class="error"></p>
+      <div class="auth-row">
+        <div class="small">New here?</div>
+        <a class="small" href="register.html">Create account</a>
+      </div>
+    </div>
   </div>
 
-
+  <script src="script.js"></script>
 </body>
-    <script src="/script.js"></script>
 </html>
