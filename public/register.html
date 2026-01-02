@@ -1,42 +1,55 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>OxyTalk - Register</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
-<body class="center">
-  <div class="card">
-    <h1>OxyTalk</h1>
-    <p class="tagline">Talk with your oxygen</p>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand">
+        <div class="logo">O</div>
+        <div>
+          <h1>OxyTalk</h1>
+          <p>Talk with your oxygen</p>
+        </div>
+      </div>
 
-    <h2>Create account</h2>
+      <div class="auth-title">Create account</div>
 
-    <form id="registerForm">
-      <label>Username</label>
-      <input name="username" placeholder="e.g. dolly_queen" required />
+      <form id="registerForm" enctype="multipart/form-data">
+        <div class="field">
+          <label>Username</label>
+          <input class="input" name="username" type="text" placeholder="e.g. dolly_queen" required />
+        </div>
 
-      <label>Email</label>
-      <input name="email" type="email" placeholder="you@email.com" required />
+        <div class="field">
+          <label>Email</label>
+          <input class="input" name="email" type="email" placeholder="you@email.com" required />
+        </div>
 
-      <label>Password</label>
-      <input name="password" type="password" placeholder="min 6 chars" required />
+        <div class="field">
+          <label>Password</label>
+          <input class="input" name="password" type="password" placeholder="min 6 chars" required />
+        </div>
 
-      <label>Profile photo (optional)</label>
-      <input name="avatar" type="file" accept="image/*" />
+        <div class="field">
+          <label>Profile photo (optional)</label>
+          <input class="input" name="avatar" type="file" accept="image/*" />
+        </div>
 
-      <button type="submit">Register</button>
-    </form>
+        <button class="btn" type="submit">Register</button>
+      </form>
 
-    <p class="muted">
-      Already have account? <a href="login.html">Login</a>
-    </p>
-
-    <p id="msg" class="error"></p>
+      <div class="auth-row">
+        <div class="small">Already have an account?</div>
+        <a class="small" href="login.html">Login</a>
+      </div>
+    </div>
   </div>
 
-
+  <script src="script.js"></script>
 </body>
-    <script src="/script.js"></script>
 </html>
