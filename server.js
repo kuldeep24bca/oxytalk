@@ -245,6 +245,43 @@ app.get("/api/chat/:id", authMiddleware, (req, res) => {
   if (!db.chats[req.params.id]) db.chats[req.params.id] = { messages: [] };
   res.json({ messages: db.chats[req.params.id].messages });
 });
+// CHAT HISTORY
+app.get("/api/chat/:id", authMiddleware, (req, res) => {
+  const db = readDB();
+  res.json({ messages: db.chats[req.params.id]?.messages || [] });
+});
+
+/* ===== CLEAR CHAT (PASTE HERE) ===== */
+app.delete("/api/chat/:chatId", authMiddleware, (req, res) => {
+  const chatId = req.params.chatId;
+  const db = readDB();
+
+  if (!db.chats[chatId]) db.chats[chatId] = { messages: [] };
+  db.chats[chatId].messages = [];
+
+  writeDB(db);
+  res.json({ ok: true });
+});
+// ================= CONTACTS LIST =================
+app.get("/api/contacts", authMiddleware, (req, res) => {
+  const db = readDB();
+
+  const contacts = db.contacts
+    .filter(
+      c => c.userA === req.user.id || c.userB === req.user.id
+    )
+    .map(c => {
+      const otherId = c.userA === req.user.id ? c.userB : c.userA;
+      const user = db.users.find(u => u.id === otherId);
+      return {
+        userId: otherId,
+        username: user?.username || "Unknown",
+        avatarUrl: user?.avatarUrl || ""
+      };
+    });
+
+  res.json({ contacts });
+});
 
 /* ================= SOCKET ================= */
 io.on("connection", socket => {
