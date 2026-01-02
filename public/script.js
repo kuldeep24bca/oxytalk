@@ -1,12 +1,17 @@
 /**
  * OxyTalk Frontend — FINAL RENDER-STABLE VERSION ✅
- * ✅ Register / Login / Chat all in one file
- * ✅ Does NOT crash if some endpoints are missing
- * ✅ Contacts list persistent (from /api/contacts)
- * ✅ Search / Invite / Open Chat works
  */
 
 window.addEventListener("DOMContentLoaded", () => {
+  /* ================= AVATAR FALLBACK ================= */
+  function getAvatar(url, username) {
+    if (url && url.trim() !== "" && url !== "default-avatar.png") return url;
+    
+    // If no URL, return a generated initial avatar
+    const name = encodeURIComponent(username || "User");
+    return `https://ui-avatars.com/api/?name=${name}&background=random&color=fff&size=128`;
+  }
+
   /* ================= API HELPER ================= */
   const API = {
     async post(url, body, isForm = false) {
@@ -21,7 +26,6 @@ window.addEventListener("DOMContentLoaded", () => {
             },
         body: isForm ? body : JSON.stringify(body)
       });
-
       const data = await res.json().catch(() => ({}));
       return { ok: res.ok, data };
     },
@@ -31,7 +35,6 @@ window.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
       const data = await res.json().catch(() => ({}));
       return { ok: res.ok, data };
     },
@@ -42,7 +45,6 @@ window.addEventListener("DOMContentLoaded", () => {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });
-
       const data = await res.json().catch(() => ({}));
       return { ok: res.ok, data };
     }
@@ -53,26 +55,20 @@ window.addEventListener("DOMContentLoaded", () => {
   if (registerForm) {
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const msg = document.getElementById("msg");
       if (msg) msg.textContent = "";
-
       const fd = new FormData(registerForm);
       const res = await API.post("/api/register", fd, true);
-
       if (!res.ok) {
         const err = res.data?.error || "Register failed";
-        if (msg) msg.textContent = err;
-        else alert(err);
+        if (msg) msg.textContent = err; else alert(err);
         return;
       }
-
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       location.href = "chat.html";
     });
-
-    return; // ✅ Stop here (register page code only)
+    return;
   }
 
   /* ================= LOGIN PAGE ================= */
@@ -80,38 +76,27 @@ window.addEventListener("DOMContentLoaded", () => {
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const msg = document.getElementById("msg");
       if (msg) msg.textContent = "";
-
       const form = new FormData(loginForm);
-      const body = {
-        email: form.get("email"),
-        password: form.get("password")
-      };
-
+      const body = { email: form.get("email"), password: form.get("password") };
       const res = await API.post("/api/login", body);
-
       if (!res.ok) {
         const err = res.data?.error || "Login failed";
-        if (msg) msg.textContent = err;
-        else alert(err);
+        if (msg) msg.textContent = err; else alert(err);
         return;
       }
-
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       location.href = "chat.html";
     });
-
-    return; // ✅ Stop here (login page code only)
+    return;
   }
 
   /* ================= CHAT PAGE ================= */
   const messagesEl = document.getElementById("messages");
-  if (!messagesEl) return; // not chat page
+  if (!messagesEl) return;
 
-  // If token missing → go login
   const token = localStorage.getItem("token") || "";
   const me = JSON.parse(localStorage.getItem("user") || "{}");
   if (!token) {
@@ -120,15 +105,20 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ---- UI refs ---- */
+  const sidebar = document.getElementById("sidebar");
+  const menuBtn = document.getElementById("menuBtn");
   const meAvatar = document.getElementById("meAvatar");
   const meName = document.getElementById("meName");
 
-  const searchInput = document.getElementById("searchInput");
-  const searchBtn = document.getElementById("searchBtn");
-  const searchResults = document.getElementById("searchResults");
+  const searchInput = document.getElementById("searchInput"); 
+  const searchBtn = document.getElementById("searchBtn");     
+  const searchInputDesktop = document.getElementById("searchInputDesktop");
+  const searchBtnDesktop = document.getElementById("searchBtnDesktop");
+  const searchResults = document.getElementById("searchResults"); 
+  const topSearchResults = document.getElementById("topSearchResults"); 
 
-  const invitesEl = document.getElementById("invites");     // optional
-  const chatListEl = document.getElementById("chatList");   // required for contacts list
+  const invitesEl = document.getElementById("invites");
+  const chatListEl = document.getElementById("chatList");
 
   const otherAvatar = document.getElementById("otherAvatar");
   const otherName = document.getElementById("otherName");
@@ -140,13 +130,14 @@ window.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById("sendBtn");
 
   const clearChatBtn = document.getElementById("clearChatBtn");
-  const lockBtn = document.getElementById("lockBtn");
-  const onceViewToggle = document.getElementById("onceViewToggle");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // Me UI
-  if (meAvatar) meAvatar.src = me.avatarUrl || "";
+  // ================= INIT UI (FIXED FOR NO CHAT SELECTED) =================
+  if (meAvatar) meAvatar.src = getAvatar(me.avatarUrl, me.username);
   if (meName) meName.textContent = me.username || "Me";
+  
+  // ✅ This fixes the broken image in your screenshot immediately
+  if (otherAvatar) otherAvatar.src = getAvatar("", "Chat"); 
 
   if (logoutBtn) {
     logoutBtn.onclick = () => {
@@ -161,51 +152,49 @@ window.addEventListener("DOMContentLoaded", () => {
   let onlineMap = {};
   let typingTimer = null;
 
-  // Once view
-  if (onceViewToggle) {
-    onceViewToggle.checked = localStorage.getItem("onceView") === "1";
-    onceViewToggle.onchange = () => {
-      localStorage.setItem("onceView", onceViewToggle.checked ? "1" : "0");
+  /* ================= SIDEBAR TOGGLE ================= */
+  if (menuBtn && sidebar) {
+    menuBtn.onclick = () => {
+      sidebar.classList.toggle("active");
     };
   }
 
-  /* ================= CONTACTS LIST (PERSISTENT) ================= */
+  /* ================= CONTACTS LIST ================= */
   async function loadContacts() {
     if (!chatListEl) return;
     chatListEl.innerHTML = "";
-
     const res = await API.get("/api/contacts");
     if (!res.ok || !Array.isArray(res.data.contacts)) return;
 
     res.data.contacts.forEach((c) => {
       const div = document.createElement("div");
       div.className = "chat-item";
-
       div.innerHTML = `
-        <img class="avatar" src="${c.avatarUrl || (meAvatar?.src || "")}">
+        <img class="avatar" src="${getAvatar(c.avatarUrl, c.username)}">
         <div class="meta">
           <div class="title">${c.username}</div>
           <div class="sub">${onlineMap[c.userId] ? "🟢 Online" : "🔴 Offline"}</div>
         </div>
       `;
-
       div.onclick = async () => {
         const check = await API.get(`/api/contact/check/${c.userId}`);
         if (check.ok && check.data.isContact) {
           startChat(check.data.chatId, c.userId, c.username, c.avatarUrl);
+          if (window.innerWidth < 768) sidebar.classList.remove("active");
         }
       };
-
       chatListEl.appendChild(div);
     });
   }
 
-  /* ================= SEARCH ================= */
-  async function doSearch() {
-    const q = (searchInput?.value || "").trim();
-    if (!searchResults) return;
+  /* ================= SEARCH LOGIC ================= */
+  async function doSearch(isDesktop = false) {
+    const input = isDesktop ? searchInputDesktop : searchInput;
+    const targetDiv = isDesktop ? searchResults : topSearchResults;
+    const q = (input?.value || "").trim();
 
-    searchResults.innerHTML = "";
+    if (!targetDiv) return;
+    targetDiv.innerHTML = "";
     if (!q) return;
 
     const res = await API.get(`/api/search?username=${encodeURIComponent(q)}`);
@@ -217,175 +206,154 @@ window.addEventListener("DOMContentLoaded", () => {
       const chatId = check.data?.chatId || "";
 
       const div = document.createElement("div");
-      div.className = "item";
-
+      div.className = "chat-item";
       div.innerHTML = `
+        <img class="avatar" src="${getAvatar(u.avatarUrl, u.username)}">
         <div class="meta">
           <div class="title">${u.username}</div>
-          <div class="sub">${onlineMap[u.id] ? "🟢 Online" : "🔴 Offline"}</div>
         </div>
-        <button>${isContact ? "Open Chat" : "Send Invite"}</button>
+        <button class="btn sm">${isContact ? "Open" : "Invite"}</button>
       `;
 
-      div.querySelector("button").onclick = async () => {
+      div.querySelector("button").onclick = async (e) => {
+        e.stopPropagation();
         if (isContact) {
           startChat(chatId, u.id, u.username, u.avatarUrl);
+          if (!isDesktop) {
+            const topSearch = document.getElementById("topSearch");
+            if(topSearch) topSearch.classList.add("hidden");
+          }
+          if (isDesktop && window.innerWidth < 768) sidebar.classList.remove("active");
         } else {
           const out = await API.post("/api/invite/send", { toUserId: u.id });
           if (!out.ok) alert(out.data?.error || "Invite failed");
           else alert("Invite sent ✅");
         }
       };
-
-      searchResults.appendChild(div);
+      targetDiv.appendChild(div);
     }
   }
 
-  if (searchBtn) searchBtn.onclick = doSearch;
+  if (searchBtn) searchBtn.onclick = () => doSearch(false);
+  if (searchBtnDesktop) searchBtnDesktop.onclick = () => doSearch(true);
 
-  /* ================= INVITES (SAFE) ================= */
+  const searchToggle = document.getElementById("searchToggle");
+  const topSearch = document.getElementById("topSearch");
+  if (searchToggle && topSearch) {
+    searchToggle.onclick = () => {
+      topSearch.classList.toggle("hidden");
+      if (!topSearch.classList.contains("hidden")) searchInput?.focus();
+    };
+  }
+
+  /* ================= INVITES ================= */
   async function loadInvites() {
     if (!invitesEl) return;
-
     invitesEl.innerHTML = "";
-
-    // ✅ this endpoint may not exist in your server → don't crash
     const res = await API.get("/api/invite/list");
     if (!res.ok || !Array.isArray(res.data.incoming)) return;
 
     res.data.incoming.forEach((inv) => {
       const div = document.createElement("div");
-      div.className = "item";
+      div.className = "chat-item";
       div.innerHTML = `
+        <img class="avatar" src="${getAvatar(inv.fromAvatarUrl, inv.fromUsername)}">
         <div class="meta">
           <div class="title">${inv.fromUsername}</div>
-          <div class="sub">wants to chat</div>
+          <div class="sub">New Invitation</div>
         </div>
-        <button>Accept</button>
+        <button class="btn sm">Accept</button>
       `;
-
       div.querySelector("button").onclick = async () => {
-        const out = await API.post("/api/invite/respond", {
-          inviteId: inv.id,
-          action: "accept"
-        });
-
+        const out = await API.post("/api/invite/respond", { inviteId: inv.id, action: "accept" });
         if (out.ok) {
           startChat(out.data.chatId, out.data.otherUserId, inv.fromUsername, inv.fromAvatarUrl);
           loadInvites();
           loadContacts();
-        } else {
-          alert(out.data?.error || "Failed to accept");
         }
       };
-
       invitesEl.appendChild(div);
     });
   }
 
   /* ================= SOCKET ================= */
   const socket = io();
-
-  socket.on("connect", () => {
-    socket.emit("auth", { token });
-  });
-
+  socket.on("connect", () => socket.emit("auth", { token }));
   socket.on("presence", ({ userId, online }) => {
     onlineMap[userId] = online;
     if (userId === currentOtherUserId && presenceText) {
       presenceText.textContent = online ? "🟢 Online" : "🔴 Offline";
     }
-    loadContacts(); // update dots
+    loadContacts();
   });
-
   socket.on("typing", ({ userId, isTyping }) => {
     if (userId === currentOtherUserId && typingText) {
       typingText.textContent = isTyping ? "Typing…" : "";
     }
   });
-
   socket.on("new_message", (msg) => {
-    if (msg.chatId !== currentChatId) return;
-    addMessage(msg);
+    if (msg.chatId === currentChatId) addMessage(msg);
   });
 
-  /* ================= CHAT ================= */
-  async function startChat(chatId, otherUserId, otherUsername = "Chat", otherAvatarUrl = "") {
+  /* ================= CHAT CORE ================= */
+  async function startChat(chatId, otherUserId, otherUsername, otherAvatarUrl) {
     currentChatId = chatId;
     currentOtherUserId = otherUserId;
-
     if (sendBtn) sendBtn.disabled = false;
     if (messageInput) messageInput.disabled = false;
     if (clearChatBtn) clearChatBtn.disabled = false;
-    if (lockBtn) lockBtn.disabled = false;
 
     if (otherName) otherName.textContent = otherUsername;
-    if (otherAvatar) otherAvatar.src = otherAvatarUrl || (meAvatar?.src || "");
+    
+    // ✅ HEADER IMAGE FALLBACK
+    if (otherAvatar) {
+        otherAvatar.src = getAvatar(otherAvatarUrl, otherUsername);
+    }
+    
     if (presenceText) presenceText.textContent = onlineMap[otherUserId] ? "🟢 Online" : "🔴 Offline";
-    if (typingText) typingText.textContent = "";
-
+    
     messagesEl.innerHTML = "";
     socket.emit("join_chat", { chatId });
-
     const hist = await API.get(`/api/chat/${chatId}`);
-    if (hist.ok && Array.isArray(hist.data.messages)) {
-      hist.data.messages.forEach(addMessage);
-    }
+    if (hist.ok && Array.isArray(hist.data.messages)) hist.data.messages.forEach(addMessage);
   }
 
   function addMessage(msg) {
     const div = document.createElement("div");
     div.className = "bubble" + (msg.fromUserId === me.id ? " me" : "");
-
-    // safe text
-    const safeText = (msg.text || "").toString();
-
-    div.innerHTML = `
-      <div class="top">
-        <span>${msg.fromUsername || ""}</span>
-        <span>${msg.time || ""}</span>
-      </div>
-      <div class="text"></div>
-    `;
-    div.querySelector(".text").textContent = safeText;
-
+    div.innerHTML = `<div class="top"><span>${msg.fromUsername || ""}</span></div><div class="text"></div>`;
+    div.querySelector(".text").textContent = msg.text || "";
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  /* ================= SEND ================= */
-  if (sendForm) {
-    sendForm.onsubmit = (e) => {
-      e.preventDefault();
-      if (!currentChatId) return;
-
-      const text = (messageInput?.value || "").trim();
-      if (!text) return;
-
-      socket.emit("send_message", {
-        chatId: currentChatId,
-        text,
-        ephemeral: localStorage.getItem("onceView") === "1"
-      });
-
-      if (messageInput) messageInput.value = "";
-      socket.emit("typing", { chatId: currentChatId, isTyping: false });
+  if (clearChatBtn) {
+    clearChatBtn.onclick = async () => {
+      if (!currentChatId || !confirm("Clear chat?")) return;
+      messagesEl.innerHTML = "";
+      await API.del(`/api/chat/${currentChatId}`);
     };
   }
 
-  /* ================= TYPING ================= */
+  if (sendForm) {
+    sendForm.onsubmit = (e) => {
+      e.preventDefault();
+      const text = (messageInput?.value || "").trim();
+      if (!text || !currentChatId) return;
+      socket.emit("send_message", { chatId: currentChatId, text });
+      messageInput.value = "";
+    };
+  }
+
   if (messageInput) {
     messageInput.oninput = () => {
       if (!currentChatId) return;
       socket.emit("typing", { chatId: currentChatId, isTyping: true });
       clearTimeout(typingTimer);
-      typingTimer = setTimeout(() => {
-        socket.emit("typing", { chatId: currentChatId, isTyping: false });
-      }, 800);
+      typingTimer = setTimeout(() => socket.emit("typing", { chatId: currentChatId, isTyping: false }), 1000);
     };
   }
 
-  /* ================= INIT ================= */
   loadContacts();
   loadInvites();
 });
